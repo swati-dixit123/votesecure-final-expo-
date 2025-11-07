@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard | Voting System</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body class="bg-gray-100 font-sans">
+  <!-- Top Bar -->
+  <header class="flex items-center justify-between bg-blue-700 text-white p-4 shadow-md">
+    <div class="flex items-center space-x-3">
+      <img src="/logo.png" alt="Logo" class="h-8 w-8 rounded-full">
+      <h1 class="text-lg font-semibold">Voting System Admin</h1>
+    </div>
+    <div class="flex items-center space-x-6">
+      <input type="text" placeholder="Search voters, candidates, elections..." class="px-3 py-1 rounded text-black w-80">
+      <div class="flex items-center space-x-2">
+        <img src="/admin-avatar.png" alt="Admin" class="h-8 w-8 rounded-full border-2 border-white">
+        <span class="font-medium">Admin</span>
+        <button class="bg-blue-600 hover:bg-blue-800 px-3 py-1 rounded">Logout</button>
+      </div>
+    </div>
+  </header>
+
+  <div class="flex h-screen">
+    <!-- Sidebar -->
+    <aside class="w-64 bg-white shadow-md p-4 space-y-2">
+      <h2 class="text-gray-500 uppercase text-xs font-bold mb-3">Navigation</h2>
+      <nav class="space-y-2">
+        <a href="#" class="block px-3 py-2 rounded hover:bg-blue-100 font-semibold text-blue-700">🏠 Dashboard</a>
+        <a href="#" class="block px-3 py-2 rounded hover:bg-blue-100">🗳️ Elections</a>
+        <a href="#" class="block px-3 py-2 rounded hover:bg-blue-100">👥 Voters</a>
+        <a href="#" class="block px-3 py-2 rounded hover:bg-blue-100">🎯 Candidates</a>
+        <a href="#" class="block px-3 py-2 rounded hover:bg-blue-100">📊 Results</a>
+        <a href="#" class="block px-3 py-2 rounded hover:bg-blue-100">🧾 Audit Logs</a>
+        <a href="#" class="block px-3 py-2 rounded hover:bg-blue-100">⚙️ Settings</a>
+      </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="flex-1 p-6 overflow-y-auto">
+      <h2 class="text-2xl font-semibold mb-6">Dashboard Overview</h2>
+
+      <!-- Overview Cards -->
+      <div class="grid grid-cols-4 gap-4 mb-8">
+        <div class="bg-white p-4 rounded shadow text-center">
+          <h3 class="text-gray-500 text-sm">Active Elections</h3>
+          <p id="activeElections" class="text-2xl font-bold text-blue-700">0</p>
+        </div>
+        <div class="bg-white p-4 rounded shadow text-center">
+          <h3 class="text-gray-500 text-sm">Voter Turnout</h3>
+          <p id="voterTurnout" class="text-2xl font-bold text-green-600">0%</p>
+        </div>
+        <div class="bg-white p-4 rounded shadow text-center">
+          <h3 class="text-gray-500 text-sm">Total Votes Cast</h3>
+          <p id="totalVotes" class="text-2xl font-bold text-yellow-600">0</p>
+        </div>
+        <div class="bg-white p-4 rounded shadow text-center">
+          <h3 class="text-gray-500 text-sm">Leading Party</h3>
+          <p id="leadingParty" class="text-2xl font-bold text-red-600">N/A</p>
+        </div>
+      </div>
+
+      <!-- Charts -->
+      <div class="grid grid-cols-2 gap-6">
+        <div class="bg-white p-6 rounded shadow">
+          <h3 class="font-semibold mb-3">Voter Turnout (Live)</h3>
+          <canvas id="turnoutChart" height="150"></canvas>
+        </div>
+
+        <div class="bg-white p-6 rounded shadow">
+          <h3 class="font-semibold mb-3">Votes by Party</h3>
+          <canvas id="partyChart" height="150"></canvas>
+        </div>
+      </div>
+    </main>
+
+    <!-- Right Sidebar -->
+    <aside class="w-72 bg-white shadow-md p-4 border-l border-gray-200">
+      <h3 class="font-semibold mb-3">Activity Feed</h3>
+      <ul id="activityFeed" class="space-y-2 text-sm">
+        <li>✅ Dashboard loaded</li>
+      </ul>
+
+      <h3 class="font-semibold mt-6 mb-3">System Status</h3>
+      <ul class="text-sm text-gray-600">
+        <li>Database: <span id="dbStatus" class="text-green-600">Connected</span></li>
+        <li>Server Load: <span id="serverLoad" class="text-yellow-600">Normal</span></li>
+        <li>Last Sync: <span id="lastSync" class="text-gray-700">Just now</span></li>
+      </ul>
+    </aside>
+  </div>
+
+  <!-- JavaScript Section -->
+  <script>
+    // Example backend data simulation
+    const dashboardData = {
+      activeElections: 1,
+      totalVoters: 10000,
+      votesCast: 730,
+      parties: [
+        { name: "Bhartiya Janta Party", votes: 677 },
+        { name: "Indian National Congress", votes: 260 },
+        { name: "Samajvadi Party", votes: 100 },
+        { name: "Aam Aadmi Party", votes: 50 },
+        {name:"Bahujan Samaj Party", votes: 90},
+        {name:"Shivsena",votes:80}
+      ]
+    };
+
+    function updateDashboard(data) {
+      // Calculate turnout and leading party
+      const turnout = ((data.votesCast / data.totalVoters) * 100).toFixed(1);
+      const leading = data.parties.reduce((max, p) => p.votes > max.votes ? p : max, data.parties[0]);
+
+      // Update overview cards
+      document.getElementById("activeElections").textContent = data.activeElections;
+      document.getElementById("voterTurnout").textContent = `${turnout}%`;
+      document.getElementById("totalVotes").textContent = data.votesCast;
+      document.getElementById("leadingParty").textContent = leading.name;
+
+      // Update activity feed
+      const feed = document.getElementById("activityFeed");
+      const li = document.createElement("li");
+      li.textContent = `📈 Data updated at ${new Date().toLocaleTimeString()}`;
+      feed.prepend(li);
+
+      // Charts
+      renderCharts(turnout, data);
+    }
+
+    function renderCharts(turnout, data) {
+      // Destroy existing charts if any
+      if (window.turnoutChartInstance) window.turnoutChartInstance.destroy();
+      if (window.partyChartInstance) window.partyChartInstance.destroy();
+
+      // Turnout chart
+      const ctx1 = document.getElementById("turnoutChart").getContext("2d");
+      window.turnoutChartInstance = new Chart(ctx1, {
+        type: "doughnut",
+        data: {
+          labels: ["Voted", "Not Voted"],
+          datasets: [{
+            data: [data.votesCast, data.totalVoters - data.votesCast],
+            backgroundColor: ["#34D399", "#E5E7EB"]
+          }]
+        },
+        options: {
+          plugins: { legend: { position: "bottom" } }
+        }
+      });
+
+      // Party votes chart
+      const ctx2 = document.getElementById("partyChart").getContext("2d");
+      window.partyChartInstance = new Chart(ctx2, {
+        type: "bar",
+        data: {
+          labels: data.parties.map(p => p.name),
+          datasets: [{
+            label: "Votes",
+            data: data.parties.map(p => p.votes),
+            backgroundColor: ["#3B82F6", "#10B981", "#F59E0B", "#EF4444"]
+          }]
+        },
+        options: {
+          scales: { y: { beginAtZero: true, title: { display: true, text: "Votes" } } },
+          plugins: { legend: { display: false } }
+        }
+      });
+    }
+
+    // Initialize
+    updateDashboard(dashboardData);
+
+    // Optional: auto-refresh every 10 seconds
+    setInterval(() => {
+      // simulate slight data change for demo
+      dashboardData.votesCast += Math.floor(Math.random() * 5);
+      dashboardData.parties[Math.floor(Math.random() * dashboardData.parties.length)].votes += Math.floor(Math.random() * 3);
+      updateDashboard(dashboardData);
+    }, 10000);
+  </script>
+</body>
+</html>

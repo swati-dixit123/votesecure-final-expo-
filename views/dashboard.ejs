@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Voting Dashboard</title>
+  <!-- Link CSS -->
+  <link rel="stylesheet" href="/css/dashboard.css">
+</head>
+<body>
+
+  <h1 class="heading">Vote for Your Preferred Party</h1>
+
+  <nav class="navbar">
+    <a href="/dashboard">Dashboard</a>
+    <a href="/profile">Profile</a>
+  </nav>
+
+  <div class="candidates-list">
+    <% if (voted) { %>
+      <h3 style="color:green;">✅ You have already voted. Thank you for participating!</h3>
+    <% } else { %>
+      <% candidates.forEach(candidate => { %>
+        <div class="card">
+          <div class="card_body">
+            <img src="<%= candidate.image %>" alt="candidate">
+            <h5><%= candidate.name %></h5>
+            <button class="button">Vote here</button>
+          </div>
+        </div>
+      <% }) %>
+    <% } %>
+  </div>
+
+  <% if (!voted) { %>
+    <button id="submit" class="submit">Submit Vote</button>
+    <p id="submit-message"></p>
+  <% } %>
+
+  <!-- Link JS -->
+  <script src="/js/dashboard.js"></script>
+</body>
+</html>

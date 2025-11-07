@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>VoteSecure - Digital Voting Portal</title>
+
+  <style>
+    /* ===== Reset & Base ===== */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: "Segoe UI", Roboto, sans-serif;
+      color: white;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      background: linear-gradient(-45deg, #002855, #004aad, #0077b6, #00b4d8);
+      background-size: 400% 400%;
+      animation: gradientMove 12s ease infinite;
+      overflow-x: hidden;
+    }
+
+    @keyframes gradientMove {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    /* ===== Flag Overlay ===== */
+    .flag-overlay {
+      position: fixed;
+      inset: 0;
+      background: linear-gradient(
+        to right,
+        rgba(255, 153, 51, 0.07),
+        rgba(255, 255, 255, 0.07),
+        rgba(19, 136, 8, 0.07)
+      );
+      z-index: 0;
+    }
+
+    /* ===== Floating Particles ===== */
+    .particle {
+      position: absolute;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.15);
+      animation: floatParticle 12s infinite ease-in-out;
+      z-index: 0;
+    }
+
+    @keyframes floatParticle {
+      0%, 100% {
+        transform: translateY(0) scale(1);
+        opacity: 0.6;
+      }
+      50% {
+        transform: translateY(-30px) scale(1.3);
+        opacity: 1;
+      }
+    }
+
+    /* ===== Header ===== */
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 15px 30px;
+      background: rgba(0, 0, 0, 0.35);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.25);
+      z-index: 2;
+      position: relative;
+      flex-wrap: wrap;
+      text-align: center;
+    }
+
+    header img {
+      height: 70px;
+      width: auto;
+    }
+
+    header h2 {
+      font-size: 1.5em;
+      font-weight: 600;
+      color: #fff;
+      margin: 10px 0;
+      flex: 1;
+    }
+
+    .time {
+      font-size: 0.95em;
+      color: #d0f0ff;
+    }
+
+    /* ===== Main ===== */
+    .main {
+      text-align: center;
+      padding: 60px 20px;
+      z-index: 2;
+      position: relative;
+    }
+
+    .main h1 {
+      font-size: 3em;
+      color: #e0faff;
+      text-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+      margin-bottom: 15px;
+    }
+
+    .main p {
+      font-size: 1.2em;
+      color: #dff9ff;
+      max-width: 650px;
+      margin: 0 auto 40px;
+      line-height: 1.6;
+    }
+
+    /* ===== Buttons ===== */
+    .btn-container {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+
+    a.btn {
+      text-decoration: none;
+      color: white;
+      background: linear-gradient(135deg, #0077b6, #00b4d8);
+      padding: 14px 35px;
+      border-radius: 30px;
+      font-size: 1.1em;
+      transition: all 0.3s ease;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      box-shadow: 0 0 15px rgba(255, 255, 255, 0.2);
+    }
+
+    a.btn:hover {
+      transform: scale(1.08);
+      background: linear-gradient(135deg, #00b4d8, #90e0ef);
+      box-shadow: 0 0 25px rgba(255, 255, 255, 0.5);
+    }
+
+    /* ===== About ===== */
+    .about {
+      margin: 60px auto;
+      padding: 25px;
+      text-align: center;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 20px;
+      backdrop-filter: blur(10px);
+      max-width: 850px;
+      z-index: 2;
+      position: relative;
+    }
+
+    .about h3 {
+      font-size: 1.8em;
+      color: #fff;
+      margin-bottom: 15px;
+    }
+
+    .about p {
+      font-size: 1em;
+      color: #e0f7ff;
+      line-height: 1.7;
+    }
+
+    /* ===== Footer ===== */
+    footer {
+      text-align: center;
+      color: #e0f7ff;
+      font-size: 0.9em;
+      padding: 10px;
+      background: rgba(0, 0, 0, 0.35);
+      border-top: 1px solid rgba(255, 255, 255, 0.25);
+      z-index: 2;
+      position: relative;
+    }
+
+    footer a {
+      color: #90e0ef;
+      text-decoration: none;
+      margin: 0 10px;
+    }
+
+    footer a:hover {
+      text-decoration: underline;
+    }
+
+    /* ===== Responsive Design ===== */
+    @media (max-width: 1024px) {
+      .main h1 {
+        font-size: 2.5em;
+      }
+      .main p {
+        font-size: 1.1em;
+      }
+    }
+
+    @media (max-width: 768px) {
+      header {
+        flex-direction: column;
+        text-align: center;
+        padding: 15px 15px;
+      }
+
+      header h2 {
+        font-size: 1.3em;
+      }
+
+      .main h1 {
+        font-size: 2em;
+      }
+
+      a.btn {
+        font-size: 1em;
+        padding: 12px 25px;
+      }
+
+      .about {
+        margin: 40px 20px;
+        padding: 20px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .main h1 {
+        font-size: 1.7em;
+      }
+
+      .main p {
+        font-size: 1em;
+      }
+
+      a.btn {
+        padding: 10px 20px;
+        font-size: 0.9em;
+      }
+
+      header img {
+        height: 45px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="flag-overlay"></div>
+
+  <!-- Floating Particles -->
+  <div class="particle" style="width:80px; height:80px; top:20%; left:15%; animation-delay:0s;"></div>
+  <div class="particle" style="width:60px; height:60px; top:50%; right:10%; animation-delay:2s;"></div>
+  <div class="particle" style="width:100px; height:100px; bottom:20%; left:40%; animation-delay:4s;"></div>
+  <div class="particle" style="width:50px; height:50px; top:70%; right:25%; animation-delay:6s;"></div>
+
+  <!-- Header -->
+  <header>
+    <img src="/images/emblem.jpg" alt="Emblem of India">
+    <h2>Government of India — VoteSecure Portal</h2>
+    <div class="time" id="timeDisplay"></div>
+  </header>
+  
+  <!-- Main Section -->
+  <section class="main">
+    <h1>Welcome to VoteSecure</h1>
+    <p>Empowering citizens through a secure, transparent, and trusted digital voting system.  
+       A step towards a digitally enabled democracy.</p>
+    <div class="btn-container">
+      <a href="/auth/signup" class="btn">Sign Up</a>
+      <a href="/auth/signin" class="btn">Sign In</a>
+      <a href="/about" class="btn">Learn More</a>
+    </div>
+  </section>
+
+  <!-- About Section -->
+  <section id="about" class="about">
+    <h3>About VoteSecure</h3>
+    <p>
+      VoteSecure is a digital platform that provides secure and verified online voting.
+      It makes the voting process safe, easy, and trustworthy for every citizen. 
+      It ensures every citizen’s vote is safe, verifiable, and counted with integrity.
+    </p>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    © 2025 VoteSecure | Digital India Initiative |
+    <a href="#">Privacy Policy</a> | <a href="#">Support</a>
+  </footer>
+
+  <!-- JS: Live Time -->
+  <script>
+    function updateTime() {
+      const now = new Date();
+      const options = { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' };
+      document.getElementById('timeDisplay').textContent = now.toLocaleDateString('en-IN', options);
+    }
+    setInterval(updateTime, 1000);
+    updateTime();
+  </script>
+</body>
+</html>

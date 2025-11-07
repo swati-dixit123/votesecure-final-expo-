@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <%- include('./partials/head') %>
+  <title>Vote Casted</title>
+</head>
+<body>
+  <%- include('./partials/nav') %>
+
+  <div class="container mt-5">
+    <div class="alert alert-success">
+      <h3>Your vote has been successfully casted!</h3>
+      <a href="/vote/dashboard" class="btn btn-primary mt-3">Back to Dashboard</a>
+    </div>
+  </div>
+
+  <%- include('./partials/scripts') %>
+</body>
+</html>
+Step 7: Update app.js
+js
+Copy code
+const voteRoutes = require("./routes/vote");
+
+// Add session & user middleware
+app.use((req, res, next) => {
+  res.locals.userName = req.session.userName || null;
+  next();
+});
+
+// Auth routes
+app.use("/auth", authRoutes);
+
+// Vote routes
+app.use("/vote", voteRoutes);

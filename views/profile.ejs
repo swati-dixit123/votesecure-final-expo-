@@ -1,0 +1,88 @@
+<%- include('./partials/nav') %>
+
+<div class="profile-container">
+  <h1>User Profile</h1>
+
+  <% if (user) { %>
+    <!-- Real User Data -->
+    <div class="profile-card">
+      <p><strong>Registered ID:</strong> <%= user._id %></p>
+      <p><strong>Full Name:</strong> <%= user.name %></p>
+      <p><strong>Email:</strong> <%= user.email %></p>
+      <p><strong>Aadhar Number:</strong> <%= user.aadhar %></p>
+      <p><strong>Age:</strong> <%= user.age %></p>
+      <p><strong>Mobile Number:</strong> <%= user.mobile %></p>
+    </div>
+  <% } else { %>
+    <!-- Dummy Data if no user found -->
+    <div class="profile-card">
+      <p><strong>Registered ID:</strong> DUMMY12345</p>
+      <p><strong>Full Name:</strong> Demo User</p>
+      <p><strong>Email:</strong> demo.user@example.com</p>
+      <p><strong>Aadhar Number:</strong> 1234-5678-9012</p>
+      <p><strong>Age:</strong> 25</p>
+      <p><strong>Mobile Number:</strong> +91 9876543210</p>
+    </div>
+
+    <div class="actions">
+      <a href="/auth/signin">Sign In</a>
+    </div>
+  <% } %>
+
+  <div class="actions">
+    <% if (user) { %>
+      <a href="/dashboard">Go to Dashboard</a>
+      <a href="/auth/logout">Logout</a>
+    <% } %>
+  </div>
+</div>
+
+<style>
+  .profile-container {
+    max-width: 600px;
+    margin: 60px auto;
+    background: rgba(255, 255, 255, 0.1);
+    color: #1a1a1a;
+    padding: 30px;
+    border-radius: 20px;
+    text-align: left;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 0 15px rgba(0, 180, 216, 0.3);
+  }
+
+  h1 {
+    text-align: center;
+    margin-bottom: 25px;
+    color: #00b4d8;
+  }
+
+  .profile-card {
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 15px;
+    padding: 20px;
+    box-shadow: 0 0 10px rgba(0, 180, 216, 0.2);
+  }
+
+  .profile-card p {
+    font-size: 1.1em;
+    margin: 10px 0;
+    color: #222;
+  }
+
+  .actions {
+    text-align: center;
+    margin-top: 20px;
+  }
+
+  .actions a {
+    text-decoration: none;
+    color: #00b4d8;
+    margin: 0 15px;
+    font-weight: bold;
+    transition: 0.3s;
+  }
+
+  .actions a:hover {
+    text-decoration: underline;
+  }
+</style>

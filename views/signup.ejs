@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <%- include('./partials/head') %>
+  <title>Signup</title>
+  <link rel="stylesheet" href="/css/dashboard.css">
+</head>
+<body>
+  <%- include('./partials/nav') %>
+
+  <div class="container mt-5">
+    <h2>Sign Up</h2>
+
+    <% if (error) { %>
+      <div class="alert alert-danger"><%= error %></div>
+    <% } %>
+
+    <form method="POST" action="/auth/signup" id="signupForm">
+      
+      <!-- Full Name -->
+      <div class="mb-3">
+        <label class="form-label">Full Name</label>
+        <input type="text" class="form-control" name="fullName" required>
+      </div>
+
+      <!-- Aadhar -->
+      <div class="mb-3">
+        <label class="form-label">Aadhar Number</label>
+        <input
+          type="text"
+          class="form-control"
+          name="Aadhar"
+          required
+          maxlength="12"
+          minlength="12"
+          pattern="\d{12}"
+          title="Aadhar number must be exactly 12 digits"
+          placeholder="Enter 12-digit Aadhar number"
+        >
+      </div>
+
+
+      <!-- Age -->
+      <div class="mb-3">
+        <label class="form-label">Age</label>
+        <input 
+          type="number" 
+          class="form-control" 
+          name="age" 
+          id="ageInput" 
+          required 
+          min="18" 
+          placeholder="Enter your age">
+      </div>
+
+      <!-- Age Checkbox -->
+      <div class="form-check mb-3">
+        <input 
+          type="checkbox" 
+          class="form-check-input" 
+          id="ageCheck" 
+          required>
+        <label class="form-check-label" for="ageCheck">
+          I confirm that I am 18 years or older
+        </label>
+      </div>
+      <div id="ageError" style="color: red; display: none;">
+        You must be 18 or older to continue
+      </div>
+
+      <!-- Mobile -->
+      <div class="mb-3">
+        <label class="form-label">Mobile Number</label>
+        <input type="text" class="form-control" name="MOB-NUM" required placeholder="Aadhar registered mobile number">
+      </div>
+
+      <!-- Email -->
+      <div class="mb-3">
+        <label class="form-label">Email</label>
+        <input type="email" class="form-control" name="email" required>
+      </div>
+
+      <!-- Password -->
+      <div class="mb-3">
+        <label class="form-label">Password</label>
+        <input 
+          type="password" 
+          class="form-control" 
+          name="password" 
+          id="passwordInput" 
+          
+          required
+          title="Password must be at least 8 characters long and include uppercase, lowercase, number, and special character."
+          placeholder="Enter a strong password">
+        <div id="passwordError" style="color: red; display: none;">
+          Password must be at least 8 characters long and include uppercase, lowercase, number, and special character.
+        </div>
+        <!-- pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$" -->
+      </div>
+      
+          
+      <!-- Confirm Password -->
+      <div class="mb-3">
+        <label class="form-label">Confirm Password</label>
+        <input 
+          type="password" 
+          class="form-control" 
+          id="confirmPasswordInput" 
+          required 
+          placeholder="Re-enter your password">
+        <div id="confirmError" style="color: red; display: none;">
+          Passwords do not match.
+        </div>
+      </div>
+
+      <!-- Submit -->
+      <button type="submit" class="btn btn-success">Sign Up</button>
+    </form>
+  </div>
+
+  <%- include('./partials/scripts') %>
+
+  <script>
+    // JS Validation for Password Match and Age Check
+    const form = document.getElementById('signupForm');
+    const ageInput = document.getElementById('ageInput');
+    const ageError = document.getElementById('ageError');
+    const passwordInput = document.getElementById('passwordInput');
+    const confirmPasswordInput = document.getElementById('confirmPasswordInput');
+    const confirmError = document.getElementById('confirmError');
+
+    form.addEventListener('submit', function (e) {
+      let valid = true;
+
+      // Age validation
+      if (parseInt(ageInput.value) < 18) {
+        ageError.style.display = 'block';
+        valid = false;
+      } else {
+        ageError.style.display = 'none';
+      }
+
+      // Password match validation
+      if (passwordInput.value !== confirmPasswordInput.value) {
+        confirmError.style.display = 'block';
+        valid = false;
+      } else {
+        confirmError.style.display = 'none';
+      }
+
+      if (!valid) e.preventDefault();
+    });
+  </script>
+</body>
+</html>

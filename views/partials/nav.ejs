@@ -1,0 +1,18 @@
+<link rel="stylesheet" href="/css/dashboard.css">
+
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+  <div class="container">
+    <a class="navbar-brand" href="/">Vote Secure</a>
+
+    <div>
+      <% if (userName) { %>
+        <span class="me-3">Hello, <%= userName %></span>
+        <a href="/profile" class="btn btn-info btn-sm me-2">Profile</a>
+        <a href="/auth/logout" class="btn btn-danger btn-sm">Logout</a>
+      <% } else { %>
+        <a href="/auth/signin" class="btn btn-primary btn-sm me-2">Sign In</a>
+        <a href="/auth/signup" class="btn btn-success btn-sm">Sign Up</a>
+      <% } %>
+    </div>
+  </div>
+</nav>

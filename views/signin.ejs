@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <%- include('./partials/head') %>
+  <title>Sign In</title>
+</head>
+<body>
+  <%- include('./partials/nav') %>
+
+  <div class="container mt-5">
+    <h2>Sign In</h2>
+
+    <% if (error) { %>
+      <div class="alert alert-danger"><%= error %></div>
+    <% } %>
+
+    <!-- Email -->
+      <div class="mb-3">
+        <label class="form-label">Email</label>
+        <input type="email" class="form-control" name="email" placeholder="Enter your Username" required>
+      </div>
+
+      <!-- Password -->
+      <div class="mb-3">
+        <label class="form-label">Password</label>
+        <input 
+          type="password" 
+          class="form-control" 
+          name="password" 
+          id="passwordInput" 
+          required
+          title="Password must be at least 8 characters long and include uppercase, lowercase, number, and special character."
+          placeholder="Enter a strong password">
+        <div id="passwordError" style="color: red; display: none;">
+          Password must be at least 8 characters long and include uppercase, lowercase, number, and special character.
+        </div>
+        <div>
+          <a href="/auth/forgot-password" class="fgetpass">Forget password</a>
+        </div>
+      </div>
+
+    <!-- ========== Step 1: Send OTP ========== -->
+    <form id="sendOtpForm">
+      <div class="mb-3">
+        
+        <label class="form-label">Mobile Number</label>
+        <input type="text" class="form-control" id="mobileNumber" name="mobileNumber" required placeholder="Enter your Aadhar registered mobile number">
+      </div>
+      <button type="submit" class="btn btn-primary">Send OTP</button>
+    </form>
+
+    <div id="otpSection" style="display:none; margin-top:20px;">
+
+
+      <!-- ========== Step 2: Verify OTP ========== -->
+      <form id="verifyOtpForm" method="POST" action="/auth/verify-otp">
+        <div class="mb-3 col-4">
+          <label class="form-label">Enter OTP</label>
+          <input type="text" class="form-control" name="otp" required>
+          <input type="hidden" name="mobileNumber" id="verifyMobileNumber">
+        </div>
+        <button type="submit" class="btn btn-success">Verify OTP & Sign In</button>
+      </form>
+    </div>
+  </div>
+
+  <%- include('./partials/scripts') %>
+
+  <script>
+    // Step 1: Send OTP via Twilio API
+    document.getElementById('sendOtpForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const mobileNumber = document.getElementById('mobileNumber').value;
+
+      const response = await fetch('/auth/send-otp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ mobileNumber })
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        alert('OTP sent successfully!');
+        document.getElementById('otpSection').style.display = 'block';
+        document.getElementById('verifyMobileNumber').value = mobileNumber;
+      } else {
+        alert('Failed to send OTP. Please try again.');
+      }
+    });
+  </script>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- <!DOCTYPE html>
+<html lang="en">
+<head>
+  <%- include('./partials/head') %>
+  <title>Signin</title>
+</head>
+<body>
+  <%- include('./partials/nav') %>
+
+  <div class="container mt-5">
+    <h2>Sign In</h2>
+    <% if (error) { %>
+      <div class="alert alert-danger"><%= error %></div>
+    <% } %>
+    <form method="POST" action="/auth/signin">
+      <div class="mb-3">
+        <label class="form-label">Email</label>
+        <input type="email" class="form-control" name="email" required>
+      </div>
+      <div class="mb-3">
+        <label class="form-label">Password</label>
+        <input type="password" class="form-control" name="password" required>
+      </div>
+      <div class="mb-3">
+        <label class="form-label">Mobile Number</label>
+        <input type="text" class="form-control" name="MOB-NUM" required placeholder="Aadhar registered mobile number">
+      </div>
+      <div>
+        <div>
+          click here to verify mobile number
+        </div>
+        <button type="submit" class="btn btn-primary">send OTP</button>
+      </div>
+      <div class="mb-3">
+        <input type="OTP" class="form-control" name="otpverify" required>
+      </div>
+      
+      <button type="submit" class="btn btn-primary">Sign In</button>
+    </form>
+  </div>
+
+  <%- include('./partials/scripts') %>
+</body>
+</html> -->
