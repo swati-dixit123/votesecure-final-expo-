@@ -8,14 +8,28 @@ const twilio = require("twilio");
 const client = twilio(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
 const verifySid = process.env.TWILIO_VERIFY_SID;
 
-// ========== EXISTING ROUTES ==========
-router.get("/signup", authController.getSignup);
-router.post("/signup", authController.postSignup);
-router.get("/signin", authController.getSignin);
-router.post("/signin", authController.postSignin);
-router.get("/logout", authController.logout);
+// Destructure controller methods
+const {
+  getSignup,
+  postSignup,
+  getSignin,
+  postSignin,
+  logout,
+  profile,
+  isLoggedIn
+} = authController;
 
-// ========== NEW Twilio OTP ROUTES ==========
+// ========== AUTH ROUTES ==========
+router.get("/signup", getSignup);
+router.post("/signup", postSignup);
+router.get("/signin", getSignin);
+router.post("/signin", postSignin);
+router.get("/logout", logout);
+
+// ✅ Protected Profile Route
+router.get("/profile", isLoggedIn, profile);
+
+// ========== TWILIO OTP ROUTES ==========
 
 // 1️⃣ Send OTP
 router.post("/send-otp", async (req, res) => {

@@ -1,4 +1,4 @@
-<%- include('./partials/nav') %>
+<%- include('partials/nav') %>
 
 <div class="profile-container">
   <h1>User Profile</h1>
@@ -10,22 +10,13 @@
       <p><strong>Full Name:</strong> <%= user.name %></p>
       <p><strong>Email:</strong> <%= user.email %></p>
       <p><strong>Aadhar Number:</strong> <%= user.aadhar %></p>
-      <p><strong>Age:</strong> <%= user.age %></p>
+      <p><strong>Voter ID:</strong> <%= user.voterId %></p>
       <p><strong>Mobile Number:</strong> <%= user.mobile %></p>
     </div>
   <% } else { %>
-    <!-- Dummy Data if no user found -->
+    <!-- No User Found -->
     <div class="profile-card">
-      <p><strong>Registered ID:</strong> DUMMY12345</p>
-      <p><strong>Full Name:</strong> Demo User</p>
-      <p><strong>Email:</strong> demo.user@example.com</p>
-      <p><strong>Aadhar Number:</strong> 1234-5678-9012</p>
-      <p><strong>Age:</strong> 25</p>
-      <p><strong>Mobile Number:</strong> +91 9876543210</p>
-    </div>
-
-    <div class="actions">
-      <a href="/auth/signin">Sign In</a>
+      <p>No user data found. Please <a href="/auth/signin">sign in</a>.</p>
     </div>
   <% } %>
 

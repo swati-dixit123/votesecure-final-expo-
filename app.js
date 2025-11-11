@@ -31,10 +31,11 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(express.static(path.resolve("./public")));
 
+
 app.use(session({
-  secret: "voting_secret",
+  secret: 'yoursecretkey',
   resave: false,
-  saveUninitialized: true
+  saveUninitialized: false
 }));
 
 // Pass user info to all views

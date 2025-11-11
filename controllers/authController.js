@@ -1,21 +1,22 @@
 const User = require("../models/user");
 const twilio = require("twilio");
-require("dotenv").config(); // Load .env
+require("dotenv").config();
 
 // Twilio setup
 const client = twilio(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
+const verifySid = process.env.TWILIO_VERIFY_SID;
 
 // ✅ GET SIGNUP
 exports.getSignup = (req, res) => {
   res.render("signup", { error: null });
 };
 
-// ✅ POST SIGNUP (improved with full duplicate checks)
+// ✅ POST SIGNUP
 exports.postSignup = async (req, res) => {
   try {
     const { fullName, email, password, Aadhar, mobile, voterID } = req.body;
 
-    // Check for duplicates (email, aadhar, or voterID)
+    // Check for duplicates
     const existingUser = await User.findOne({
       $or: [{ email }, { aadhar: Aadhar }, { voterId: voterID }]
     });
@@ -31,11 +32,11 @@ exports.postSignup = async (req, res) => {
     // Create new user
     await User.create({
       name: fullName,
+      email,
+      password,
       aadhar: Aadhar,
       mobile,
-      voterId: voterID,
-      email,
-      password
+      voterId: voterID
     });
 
     console.log("✅ New user registered successfully");
@@ -51,33 +52,14 @@ exports.getSignin = (req, res) => {
   res.render("signin", { error: null });
 };
 
-// ✅ SEND OTP (for phone verification)
-exports.sendOtp = async (req, res) => {
-  const { phone } = req.body;
-  if (!phone) return res.status(400).json({ success: false, message: "Phone number required" });
-
-  try {
-    const verification = await client.verify.v2.services(process.env.TWILIO_VERIFY_SID)
-      .verifications
-      .create({ to: `+91${phone}`, channel: "sms" });
-
-    console.log("📲 OTP sent:", verification.sid);
-    res.json({ success: true, message: "OTP sent successfully!" });
-  } catch (err) {
-    console.error("Twilio error:", err.message);
-    res.status(500).json({ success: false, message: "Failed to send OTP" });
-  }
-};
-
 // ✅ VERIFY OTP + LOGIN
 exports.postSignin = async (req, res) => {
   try {
     const { email, password, ["MOB-NUM"]: phone, OTP } = req.body;
 
     // 1️⃣ Verify OTP
-    const verificationCheck = await client.verify.v2.services(process.env.TWILIO_VERIFY_SID)
-      .verificationChecks
-      .create({ to: `+91${phone}`, code: OTP });
+    const verificationCheck = await client.verify.v2.services(verifySid)
+      .verificationChecks.create({ to: `+91${phone}`, code: OTP });
 
     if (verificationCheck.status !== "approved") {
       return res.render("signin", { error: "Invalid OTP" });
@@ -102,6 +84,41 @@ exports.postSignin = async (req, res) => {
   }
 };
 
+// ✅ Middleware: check if user logged in
+function isLoggedIn(req, res, next) {
+  if (!req.session.userId) {
+    return res.redirect("/auth/signin");
+  }
+  next();
+}
+
+// ✅ PROFILE PAGE
+exports.profile = async (req, res) => {
+  try {
+    if (!req.session.userId) return res.redirect("/auth/signin");
+
+    const user = await User.findById(req.session.userId);
+    if (!user) {
+      req.session.destroy();
+      return res.redirect("/auth/signin");
+    }
+
+    res.render("profile", {
+      user: {
+        name: user.name,
+        email: user.email,
+        aadhar: user.aadhar,
+        mobile: user.mobile,
+        voterId: user.voterId,
+        registeredId: user._id
+      }
+    });
+  } catch (err) {
+    console.error("❌ Profile Fetch Error:", err);
+    res.status(500).send("Error loading profile page");
+  }
+};
+
 // ✅ LOGOUT
 exports.logout = (req, res) => {
   req.session.destroy(err => {
@@ -111,4 +128,24 @@ exports.logout = (req, res) => {
     }
     res.redirect("/auth/signin");
   });
+};
+
+// Export isLoggedIn so router can use it
+exports.isLoggedIn = isLoggedIn;
+
+// ✅ SEND OTP (for signup/login)
+exports.sendOtp = async (req, res) => {
+  const { phone } = req.body;
+  if (!phone) return res.status(400).json({ success: false, message: "Phone number required" });
+
+  try {
+    const verification = await client.verify.v2.services(verifySid)
+      .verifications.create({ to: `+91${phone}`, channel: "sms" });
+
+    console.log("📲 OTP sent:", verification.sid);
+    res.json({ success: true, message: "OTP sent successfully!" });
+  } catch (err) {
+    console.error("Twilio error:", err.message);
+    res.status(500).json({ success: false, message: "Failed to send OTP" });
+  }
 };
