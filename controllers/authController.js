@@ -1,6 +1,6 @@
 const User = require("../models/user");
 const twilio = require("twilio");
-require("dotenv").config(); // load .env
+require("dotenv").config(); // Load .env
 
 // Twilio setup
 const client = twilio(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
@@ -10,18 +10,39 @@ exports.getSignup = (req, res) => {
   res.render("signup", { error: null });
 };
 
-// ✅ POST SIGNUP
+// ✅ POST SIGNUP (improved with full duplicate checks)
 exports.postSignup = async (req, res) => {
   try {
-    const { fullName, email, password ,aadhar,mobile} = req.body;
-    const existingUser = await User.findOne({ email });
-    if (existingUser) return res.render("signup", { error: "Email already exists" });
+    const { fullName, email, password, Aadhar, mobile, voterID } = req.body;
 
-    await User.create({ fullName, email, password });
+    // Check for duplicates (email, aadhar, or voterID)
+    const existingUser = await User.findOne({
+      $or: [{ email }, { aadhar: Aadhar }, { voterId: voterID }]
+    });
+
+    if (existingUser) {
+      let msg = "User already exists with ";
+      if (existingUser.email === email) msg += "this Email.";
+      else if (existingUser.aadhar === Aadhar) msg += "this Aadhar Number.";
+      else msg += "this Voter ID.";
+      return res.render("signup", { error: msg });
+    }
+
+    // Create new user
+    await User.create({
+      name: fullName,
+      aadhar: Aadhar,
+      mobile,
+      voterId: voterID,
+      email,
+      password
+    });
+
+    console.log("✅ New user registered successfully");
     res.redirect("/auth/signin");
   } catch (err) {
-    console.error(err);
-    res.render("signup", { error: "Signup failed" });
+    console.error("❌ Signup error:", err);
+    res.render("signup", { error: "Signup failed. Please try again." });
   }
 };
 
@@ -30,7 +51,7 @@ exports.getSignin = (req, res) => {
   res.render("signin", { error: null });
 };
 
-// ✅ SEND OTP
+// ✅ SEND OTP (for phone verification)
 exports.sendOtp = async (req, res) => {
   const { phone } = req.body;
   if (!phone) return res.status(400).json({ success: false, message: "Phone number required" });
@@ -40,7 +61,7 @@ exports.sendOtp = async (req, res) => {
       .verifications
       .create({ to: `+91${phone}`, channel: "sms" });
 
-    console.log("OTP sent:", verification.sid);
+    console.log("📲 OTP sent:", verification.sid);
     res.json({ success: true, message: "OTP sent successfully!" });
   } catch (err) {
     console.error("Twilio error:", err.message);
@@ -71,12 +92,13 @@ exports.postSignin = async (req, res) => {
 
     // ✅ Login success
     req.session.userId = user._id;
-    req.session.userName = user.fullName;
+    req.session.userName = user.name;
 
+    console.log(`✅ ${user.name} logged in successfully`);
     res.redirect("/dashboard");
   } catch (err) {
-    console.error(err);
-    res.render("signin", { error: "Signin failed" });
+    console.error("❌ Signin error:", err);
+    res.render("signin", { error: "Signin failed. Please try again." });
   }
 };
 
@@ -90,80 +112,3 @@ exports.logout = (req, res) => {
     res.redirect("/auth/signin");
   });
 };
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// const User = require("../models/user");
-
-// // Render signup page
-// exports.getSignup = (req, res) => {
-//   res.render("signup", { error: null });
-// };
-
-// // Handle signup POST
-// exports.postSignup = async (req, res) => {
-//   try {
-//     const { fullName, email, password } = req.body;
-//     const existingUser = await User.findOne({ email });
-//     if (existingUser) {
-//       return res.render("signup", { error: "Email already exists" });
-//     }
-//     await User.create({ fullName, email, password });
-//     res.redirect("/auth/signin");
-//   } catch (err) {
-//     console.error(err);
-//     res.render("signup", { error: "Signup failed" });
-//   }
-// };
-
-// // Render signin page
-// exports.getSignin = (req, res) => {
-//   res.render("signin", { error: null });
-// };
-
-// // Handle signin POST
-// exports.postSignin = async (req, res) => {
-//   try {
-//     const { email, password } = req.body;
-//     const user = await User.findOne({ email });
-//     if (!user) return res.render("signin", { error: "Invalid email or password" });
-
-//     const isMatch = await user.comparePassword(password);
-//     if (!isMatch) return res.render("signin", { error: "Invalid email or password" });
-
-//     // Save user session
-//     req.session.userId = user._id;
-//     req.session.userName = user.fullName;
-
-//     res.redirect("/dashboard");
-//   } catch (err) {
-//     console.error(err);
-//     res.render("signin", { error: "Signin failed" });
-//   }
-// };
-
-// // Handle logout
-// exports.logout = (req, res) => {
-//   req.session.destroy();
-//   res.redirect("/auth/signin");
-// };

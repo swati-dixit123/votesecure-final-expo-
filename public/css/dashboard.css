@@ -40,7 +40,7 @@ a:hover {
 .navbar-brand {
   font-size: 32px;
   font-weight: 900;
-  color: #4a7897 !important; /* Navy blue = authority & trust */
+  color: #4444ad !important; /* Navy blue = authority & trust */
   text-transform: uppercase;
   letter-spacing: 1px;
   text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.15);
