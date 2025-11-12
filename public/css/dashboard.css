@@ -316,3 +316,15 @@ h5 {
     font-size: 24px;
   }
 }
+
+/* admin */
+
+.admindeco{
+  position: absolute; 
+  top: 7px; right: 31px; 
+  background-color:none; 
+  color: white; 
+  padding: 8px 16px; 
+  border-radius: 6px; 
+  text-decoration: none; font-weight: 500;
+}

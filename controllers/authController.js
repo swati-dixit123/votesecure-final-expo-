@@ -16,7 +16,11 @@ exports.postSignup = async (req, res) => {
   try {
     const { fullName, email, password, Aadhar, mobile, voterID } = req.body;
 
-    // Check for duplicates
+    // Uploaded files from multer
+    const voterIdImage = req.body.voterIdImage || null;
+    const photo = req.body.photo || null;
+
+    // Check duplicates
     const existingUser = await User.findOne({
       $or: [{ email }, { aadhar: Aadhar }, { voterId: voterID }]
     });
@@ -29,14 +33,16 @@ exports.postSignup = async (req, res) => {
       return res.render("signup", { error: msg });
     }
 
-    // Create new user
+    // Save user
     await User.create({
       name: fullName,
       email,
       password,
       aadhar: Aadhar,
       mobile,
-      voterId: voterID
+      voterId: voterID,
+      voterIdImage,
+      photo
     });
 
     console.log("✅ New user registered successfully");
@@ -52,17 +58,19 @@ exports.getSignin = (req, res) => {
   res.render("signin", { error: null });
 };
 
-// ✅ VERIFY OTP + LOGIN
+// ✅ POST SIGNIN WITH OTP
 exports.postSignin = async (req, res) => {
   try {
-    const { email, password, ["MOB-NUM"]: phone, OTP } = req.body;
+    const { email, password, phone, OTP } = req.body;
 
     // 1️⃣ Verify OTP
-    const verificationCheck = await client.verify.v2.services(verifySid)
-      .verificationChecks.create({ to: `+91${phone}`, code: OTP });
+    if (OTP) {
+      const verificationCheck = await client.verify.v2.services(verifySid)
+        .verificationChecks.create({ to: `+91${phone}`, code: OTP });
 
-    if (verificationCheck.status !== "approved") {
-      return res.render("signin", { error: "Invalid OTP" });
+      if (verificationCheck.status !== "approved") {
+        return res.render("signin", { error: "Invalid OTP" });
+      }
     }
 
     // 2️⃣ Verify user
@@ -110,7 +118,8 @@ exports.profile = async (req, res) => {
         aadhar: user.aadhar,
         mobile: user.mobile,
         voterId: user.voterId,
-        registeredId: user._id
+        photo: user.photo,
+        voterIdImage: user.voterIdImage
       }
     });
   } catch (err) {
@@ -130,10 +139,10 @@ exports.logout = (req, res) => {
   });
 };
 
-// Export isLoggedIn so router can use it
+// Export middleware
 exports.isLoggedIn = isLoggedIn;
 
-// ✅ SEND OTP (for signup/login)
+// ✅ SEND OTP (optional)
 exports.sendOtp = async (req, res) => {
   const { phone } = req.body;
   if (!phone) return res.status(400).json({ success: false, message: "Phone number required" });

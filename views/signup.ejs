@@ -15,8 +15,8 @@
       <div class="alert alert-danger"><%= error %></div>
     <% } %>
 
-    <form method="POST" action="/auth/signup" id="signupForm">
-      
+    <form method="POST" action="/auth/signup" id="signupForm" enctype="multipart/form-data">
+  
       <!-- Full Name -->
       <div class="mb-3">
         <label class="form-label">Full Name</label>
@@ -86,6 +86,17 @@
         <input type="text" class="form-control" name="voterID" placeholder="Enter voterID" required>
       </div>
 
+       
+      <div class="mb-3">
+    <label class="form-label">Upload Voter ID Image</label>
+    <input type="file" class="form-control" name="voterIdImage" accept="image/*" required>
+    </div>
+
+  <!-- Upload Profile Photo -->
+  <div class="mb-3">
+    <label class="form-label">Upload Your Photo</label>
+    <input type="file" class="form-control" name="photo" accept="image/*" required>
+   </div>
 
       <!-- Password -->
       <div class="mb-3">
